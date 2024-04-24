@@ -1,6 +1,9 @@
 import pygame as pg 
 import sys
 from Entities.player import Player
+from time import sleep
+from Debug import  terminal
+
 class Game:
     def __init__(self, win_size=(400,600)):
         pg.init()
@@ -26,22 +29,24 @@ class Game:
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_SPACE:
                     self.player.shoot()
-        keys = pg.key.get_pressed()
 
-        if keys[pg.K_a]:
-            self.player.move_left()
-        elif keys[pg.K_d]:
-            self.player.move_right()
-        else:
-            self.player.stop_player()
+
+    def check_player_movements(self):
+
+        self.player.check_movement(keys=pg.key.get_pressed())
     
     def run(self):
         while True:
             self.screen.fill((34, 57, 94))
             self.check_events()
+            self.check_player_movements()
 
             self.player.update()
-            
+
+            terminal.clear_terminal()
+            print(f'Acceleration: {self.player.acceleration["x"]}')
+            print(f'Velocity: {self.player.velocity["x"]}')
+            #sleep(.1)
 
             pg.display.flip()
             self.clock.tick(60)

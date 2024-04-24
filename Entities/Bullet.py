@@ -3,6 +3,7 @@ import random
 
 class Bullet:
     def __init__(self, player_position_x, player_position_y) -> None:
+
         self.size = (20, 20)
         self.position_x = player_position_x
         self.position_y = player_position_y
