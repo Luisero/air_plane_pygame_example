@@ -4,6 +4,7 @@ from Entities.player import Player
 from time import sleep
 from Debug import  terminal
 from Entities.Enemies.Enemy import Enemy
+from random import randint
 
 class Game:
     def __init__(self, win_size=(400,600)):
@@ -25,7 +26,7 @@ class Game:
         self.enemies = [
             Enemy(context=self,life=100, position_dic={'x': self.CENTER[0], 'y':30}, enemy_size = (60,50), \
                   sprite_list=['Assets/basic_enemy.png'],bullet_sprite='Assets/bullet.png',\
-                  acceleration_increaser=0.2, max_velocity={'x':1.5,'y':0})
+                  acceleration_increaser=0.1, max_velocity={'x':.2,'y':0})
         ]
     
     def check_events(self):
@@ -40,6 +41,7 @@ class Game:
     def draw_enemies(self):
         for enemy in self.enemies:
             enemy.draw()
+            enemy.detect_collison()
 
     def update_enemies(self):
         for enemy in self.enemies:
@@ -48,7 +50,13 @@ class Game:
     def check_player_movements(self):
 
         self.player.check_movement(keys=pg.key.get_pressed())
-    
+
+    def add_enemy(self):
+        self.enemies.append(
+            Enemy(context=self, life=100, position_dic={'x': self.CENTER[0], 'y': 30}, enemy_size=(60, 50), \
+                  sprite_list=['Assets/basic_enemy.png'], bullet_sprite='Assets/bullet.png', \
+                  acceleration_increaser=0.1, max_velocity={'x': .2, 'y': 0})
+        )
     def run(self):
         while True:
             self.screen.fill((34, 57, 94))
@@ -59,9 +67,15 @@ class Game:
             self.draw_enemies()
             self.update_enemies()
             terminal.clear_terminal()
-            print(f'Acceleration: {self.player.acceleration["x"]}')
+            '''print(f'Acceleration: {self.player.acceleration["x"]}')
             print(f'Velocity: {self.player.velocity["x"]}')
-            print(self.enemies[0].position_dic['x'])
+            print(f'\tAcceleration: {self.enemies[0].acceleration["x"]}')
+            print(f'\tVelocity: {self.enemies[0].acceleration["x"]}')'''
+
+            if (self.time % 100) == 0:
+                self.add_enemy()
+
+            #print(self.enemies[0].position_dic['x'])
             self.time = pg.time.get_ticks()
             #sleep(.1)
 

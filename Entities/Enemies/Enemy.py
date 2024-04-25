@@ -1,5 +1,6 @@
 import pygame as pg
 from math import fabs, floor
+from time import sleep
 
 class Enemy:
     def __init__(self, context, life, position_dic,enemy_size, sprite_list, bullet_sprite, acceleration_increaser, max_velocity):
@@ -11,6 +12,7 @@ class Enemy:
         self.bullet_sprite = bullet_sprite
         self.acceleration_increaser = acceleration_increaser
         self.max_velocity = max_velocity
+        self.can_turn = True
 
         self.bullets = []
 
@@ -27,28 +29,30 @@ class Enemy:
 
         self.is_going_left = True
         self.is_going_right = False
+
     def draw(self):
         image = pg.image.load(self.sprite_list[0])
         image = pg.transform.scale(image, self.enemy_size)
+        self.mask_collider = pg.mask.from_surface(image)
         self.image = self.context.screen.blit(image, (self.position_dic['x'], self.position_dic['y']))
 
     def check_movement(self):
-
         if self.is_in_corners():
-            if self.is_going_left:
-                self.is_going_left =  not self.is_going_left
-                self.is_going_right = not self.is_going_right
+            self.can_turn = not self.can_turn
+            if self.get_corner() == 'Left':
+                self.is_going_left = False
+                self.is_going_right = True
             else:
-                self.is_going_left = not self.is_going_left
-                self.is_going_right = not self.is_going_right
+                self.is_going_left = True
+                self.is_going_right = False
+
+            #print(f'Can turn: {self.can_turn} Left: {self.is_going_left} Right: {self.is_going_right}')
 
 
         if self.is_going_left:
             self.move_left()
         elif self.is_going_right:
             self.move_right()
-        else:
-            self.stop_enemy()
 
 
     def update(self):
@@ -56,10 +60,21 @@ class Enemy:
         self.position_dic['x'] += self.velocity['x']
         self.check_movement()
     def is_in_corners(self):
-        if (self.position_dic['x'] < self.enemy_size[0] ) or (self.position_dic['x'] > self.context.WINDOW_WIDTH - self.enemy_size[0] * 2):
-            return True
+        if self.can_turn:
+            if (self.position_dic['x'] < self.enemy_size[0]/2) or (self.position_dic['x'] > self.context.WINDOW_WIDTH - self.enemy_size[0] * 3):
+                self.can_turn = not self.can_turn
+                from time import sleep
+                #print(f'Can turn: {self.can_turn} Left: {self.is_going_left} Right: {self.is_going_right}')
+
+                return True
+
         return False
 
+    def get_corner(self):
+        if (self.position_dic['x'] < self.enemy_size[0]) :
+            return 'Left'
+        else:
+            return 'Right'
     def move_left(self):
         if self.velocity['x'] > - self.max_velocity['x']:
 
@@ -78,10 +93,21 @@ class Enemy:
             pass
         else:
             if self.is_moving_left() :
-                self.acceleration['x'] = self.acceleration_increaser
+                self.acceleration['x'] = self.acceleration_increaser/2
+                self.velocity['x'] += self.acceleration['x']
             elif self.is_moving_right():
-                self.acceleration['x'] = - self.acceleration_increaser
+                self.acceleration['x'] = - self.acceleration_increaser/2
+                self.acceleration['x'] = self.acceleration['x']
 
+    def remove(self):
+        self.context.enemies.remove(self)
+    def detect_collison(self):
+        for bullet in self.context.player.bullets:
+            offset = (bullet.position_x - self.position_dic['x'], bullet.position_y - self.position_dic['y'])
+            overlap = self.mask_collider.overlap(bullet.get_mask_collider(), offset)
+            if overlap:
+                bullet.remove(self.context)
+                self.remove()
 
 
     def is_moving_right(self):
