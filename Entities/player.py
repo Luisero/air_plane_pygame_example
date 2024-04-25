@@ -77,7 +77,8 @@ class Player:
 
     def shoot(self):
         self.bullets.append(Bullet(self.position_dic['x']+ self.player_size[1]/2, \
-                                   self.position_dic['y'], -.1,-5, 'Assets/bullet.png'))
+                                   self.position_dic['y'], -.1,-5,self.velocity['x'], 'Assets/bullet.png'))
+
 
 
     def remove_bullet(self):

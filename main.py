@@ -19,6 +19,7 @@ class Game:
         self.CENTER = (self.WINDOW_WIDTH/2, self.WINDOW_HEIGHT/2)
 
         self.SKY_SCROLL_SPEED = 1
+        self.SKY_MAX_SPEED = 2
         self.SKY_SCROLL_ACCELERATION = .001
 
         PLAYER_INITIAL_POSITION = {'x':self.CENTER[0], 'y': self.CENTER[1]+200}
@@ -56,7 +57,8 @@ class Game:
                image['y'] = self.sky_images[i-1]['y']- self.WINDOW_HEIGHT
 
             image['y'] += self.SKY_SCROLL_SPEED
-            self.SKY_SCROLL_SPEED += self.SKY_SCROLL_ACCELERATION
+            if self.SKY_SCROLL_SPEED < self.SKY_MAX_SPEED:
+                self.SKY_SCROLL_SPEED += self.SKY_SCROLL_ACCELERATION
 
         for i in range(3):
             self.screen.blit(self.sky_images[i]['image'], (0, self.sky_images[i]['y']))

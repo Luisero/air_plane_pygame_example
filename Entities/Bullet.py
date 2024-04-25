@@ -3,13 +3,13 @@ import random
 
 class Bullet:
     damage = 100
-    def __init__(self, player_position_x, player_position_y, acceleration_y, velocity_y, sprite_path) -> None:
+    def __init__(self, player_position_x, player_position_y, acceleration_y, velocity_y, velocity_x, sprite_path) -> None:
 
         self.size = (20, 20)
         self.position_x = player_position_x
         self.position_y = player_position_y
         self.velocity_y = velocity_y
-        self.velocity_x = 0
+        self.velocity_x = velocity_x*.1
         self.acceleration_y = acceleration_y
         self.sprite_path = sprite_path
 
@@ -28,8 +28,9 @@ class Bullet:
         game.player.bullets.remove(self)
 
     def update_position(self):
-        self.velocity_x +=
+
         self.velocity_y += self.acceleration_y
         self.position_y += self.velocity_y
+        self.position_x += self.velocity_x
 
     

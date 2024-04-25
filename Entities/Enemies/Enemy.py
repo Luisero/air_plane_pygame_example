@@ -1,3 +1,5 @@
+import random
+
 import pygame as pg
 from math import fabs, floor
 from time import sleep
@@ -59,7 +61,7 @@ class Enemy:
             self.move_right()
 
     def check_fire(self):
-        interval = 40
+        interval = random.randint(60,100)
 
         if self.can_fire and len(self.bullets) <1:
             if self.context.player.position_dic['x'] - interval <= self.position_dic['x'] <= self.context.player.position_dic['x'] + interval:
@@ -70,7 +72,7 @@ class Enemy:
             self.can_fire = True
     def shoot(self):
         self.bullets.append(Bullet(self.position_dic['x'] + self.enemy_size[1] / 2,\
-                                   self.position_dic['y'], .1, 5, 'Assets/bullet2.png'))
+                                   self.position_dic['y'], .1, 5, self.velocity['x'],'Assets/bullet2.png'))
 
     def update(self):
         self.velocity['x'] += self.acceleration['x']
