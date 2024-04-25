@@ -66,6 +66,8 @@ class Player:
         if self.velocity['x'] < 0:
             return True
         return False
+
+
     def update(self):
         self.velocity['x'] += self.acceleration['x']
         self.position_dic['x'] += self.velocity['x']
@@ -74,7 +76,8 @@ class Player:
         self.draw_bullets()
 
     def shoot(self):
-        self.bullets.append(Bullet(self.position_dic['x']+ self.player_size[1]/2, self.position_dic['y']))
+        self.bullets.append(Bullet(self.position_dic['x']+ self.player_size[1]/2, \
+                                   self.position_dic['y'], -.1,-5, 'Assets/bullet.png'))
 
 
     def remove_bullet(self):

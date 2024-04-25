@@ -1,6 +1,7 @@
 import pygame as pg
 from math import fabs, floor
 from time import sleep
+from Entities.Bullet import Bullet
 
 class Enemy:
     def __init__(self, context, life, position_dic,enemy_size, sprite_list, bullet_sprite, acceleration_increaser, max_velocity):
@@ -13,7 +14,7 @@ class Enemy:
         self.acceleration_increaser = acceleration_increaser
         self.max_velocity = max_velocity
         self.can_turn = True
-
+        self.can_fire = True
         self.bullets = []
 
         self.velocity = {
@@ -32,9 +33,12 @@ class Enemy:
 
     def draw(self):
         image = pg.image.load(self.sprite_list[0])
+        image= pg.transform.flip(image, False, True)
         image = pg.transform.scale(image, self.enemy_size)
         self.mask_collider = pg.mask.from_surface(image)
+
         self.image = self.context.screen.blit(image, (self.position_dic['x'], self.position_dic['y']))
+
 
     def check_movement(self):
         if self.is_in_corners():
@@ -54,11 +58,27 @@ class Enemy:
         elif self.is_going_right:
             self.move_right()
 
+    def check_fire(self):
+        interval = 40
+
+        if self.can_fire and len(self.bullets) <1:
+            if self.context.player.position_dic['x'] - interval <= self.position_dic['x'] <= self.context.player.position_dic['x'] + interval:
+                self.shoot()
+
+
+        if not self.context.player.position_dic['x'] - interval <= self.position_dic['x'] <= self.context.player.position_dic['x'] + interval:
+            self.can_fire = True
+    def shoot(self):
+        self.bullets.append(Bullet(self.position_dic['x'] + self.enemy_size[1] / 2,\
+                                   self.position_dic['y'], .1, 5, 'Assets/bullet2.png'))
 
     def update(self):
         self.velocity['x'] += self.acceleration['x']
         self.position_dic['x'] += self.velocity['x']
         self.check_movement()
+        self.check_fire()
+        self.draw_bullets()
+        self.remove_bullet()
     def is_in_corners(self):
         if self.can_turn:
             if (self.position_dic['x'] < self.enemy_size[0]/2) or (self.position_dic['x'] > self.context.WINDOW_WIDTH - self.enemy_size[0] * 3):
@@ -106,10 +126,21 @@ class Enemy:
             offset = (bullet.position_x - self.position_dic['x'], bullet.position_y - self.position_dic['y'])
             overlap = self.mask_collider.overlap(bullet.get_mask_collider(), offset)
             if overlap:
-                bullet.remove(self.context)
-                self.remove()
 
+                self.life -= Bullet.damage
+                if self.life <=0:
+                    bullet.remove(self.context)
+                    self.remove()
 
+    def remove_bullet(self):
+        for bullet in self.bullets:
+            if bullet.position_y > self.context.WINDOW_HEIGHT:
+                self.bullets.remove(bullet)
+
+    def draw_bullets(self):
+        for bullet in self.bullets:
+            bullet.draw(self.context)
+            bullet.update_position()
     def is_moving_right(self):
         if self.velocity['x'] > 0:
             return True

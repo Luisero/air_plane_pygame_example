@@ -1,4 +1,6 @@
-import pygame as pg 
+import random
+
+import pygame as pg
 import sys
 from Entities.player import Player
 from time import sleep
@@ -16,6 +18,9 @@ class Game:
 
         self.CENTER = (self.WINDOW_WIDTH/2, self.WINDOW_HEIGHT/2)
 
+        self.SKY_SCROLL_SPEED = 1
+        self.SKY_SCROLL_ACCELERATION = .001
+
         PLAYER_INITIAL_POSITION = {'x':self.CENTER[0], 'y': self.CENTER[1]+200}
         self.player = Player(self, PLAYER_INITIAL_POSITION, player_size=(60, 50) )
 
@@ -24,11 +29,41 @@ class Game:
         self.clock = pg.time.Clock()
 
         self.enemies = [
-            Enemy(context=self,life=100, position_dic={'x': self.CENTER[0], 'y':30}, enemy_size = (60,50), \
+            Enemy(context=self,life=100, position_dic={'x': self.WINDOW_WIDTH, 'y':30}, enemy_size = (60,50), \
                   sprite_list=['Assets/basic_enemy.png'],bullet_sprite='Assets/bullet.png',\
                   acceleration_increaser=0.1, max_velocity={'x':.2,'y':0})
         ]
-    
+        self.sky_images =[]
+        self.load_sky_image()
+
+    def load_sky_image(self):
+        for i in range(0, 3):
+            image = pg.image.load('Assets/sky.png').convert()
+            image = pg.transform.scale(image, (self.WINDOW_HEIGHT, self.WINDOW_HEIGHT)  )
+            height = image.get_height()
+            self.sky_images.append({"image":image,'y':-i*height})
+
+
+
+
+    def draw_background_sky(self):
+        for i,image in enumerate(self.sky_images):
+
+            if image['y'] > self.WINDOW_HEIGHT:
+                self.sky_images.insert(0, self.sky_images.pop() )
+
+            if i > 0:
+               image['y'] = self.sky_images[i-1]['y']- self.WINDOW_HEIGHT
+
+            image['y'] += self.SKY_SCROLL_SPEED
+            self.SKY_SCROLL_SPEED += self.SKY_SCROLL_ACCELERATION
+
+        for i in range(3):
+            self.screen.blit(self.sky_images[i]['image'], (0, self.sky_images[i]['y']))
+
+
+
+
     def check_events(self):
         for event in pg.event.get():
             if event.type == pg.QUIT or (event.type== pg.KEYDOWN and event.key == pg.K_ESCAPE):
@@ -52,14 +87,17 @@ class Game:
         self.player.check_movement(keys=pg.key.get_pressed())
 
     def add_enemy(self):
+        random_positions = [self.WINDOW_WIDTH, -30]
+        position = random.choice(random_positions)
         self.enemies.append(
-            Enemy(context=self, life=100, position_dic={'x': self.CENTER[0], 'y': 30}, enemy_size=(60, 50), \
+            Enemy(context=self, life=100, position_dic={'x': position+randint(-50,50), 'y': randint(30,60)}, enemy_size=(60, 50), \
                   sprite_list=['Assets/basic_enemy.png'], bullet_sprite='Assets/bullet.png', \
                   acceleration_increaser=0.1, max_velocity={'x': .2, 'y': 0})
         )
     def run(self):
         while True:
             self.screen.fill((34, 57, 94))
+            self.draw_background_sky()
             self.check_events()
             self.check_player_movements()
 
@@ -72,7 +110,7 @@ class Game:
             print(f'\tAcceleration: {self.enemies[0].acceleration["x"]}')
             print(f'\tVelocity: {self.enemies[0].acceleration["x"]}')'''
 
-            if (self.time % 100) == 0:
+            if (self.time % 1000) == 0:
                 self.add_enemy()
 
             #print(self.enemies[0].position_dic['x'])
