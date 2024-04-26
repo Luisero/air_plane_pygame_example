@@ -125,6 +125,7 @@ class Enemy:
                 self.acceleration['x'] = self.acceleration['x']
 
     def remove(self):
+        self.context.score +=1
         self.context.enemies.remove(self)
     def detect_collison(self):
         for bullet in self.context.player.bullets:

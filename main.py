@@ -11,7 +11,11 @@ from random import randint
 class Game:
     def __init__(self, win_size=(400,600)):
         pg.init()
+        pg.mixer.init()
+        pg.font.init()
 
+        self.font = pg.font.SysFont(None, 36)
+        self.score = 0
         self.WINDOW_SIZE = win_size
         self.WINDOW_HEIGHT = self.WINDOW_SIZE[1]
         self.WINDOW_WIDTH = self.WINDOW_SIZE[0]
@@ -40,11 +44,17 @@ class Game:
                   acceleration_increaser=0.1, max_velocity={'x':.2,'y':0})
         ]
 
-        pg.mixer.init()
         self.sky_images =[]
 
         self.load_sky_image()
 
+    def render_life(self):
+        life_text = self.font.render(f'Life: {self.player.life}', True, 'white')
+        self.screen.blit(life_text, (10, 10))
+
+    def render_score(self):
+        score_text = self.font.render(f'Points: {self.score}', True, 'white')
+        self.screen.blit(score_text, (10, 35))
     def load_sky_image(self):
         for i in range(0, 3):
             image = pg.image.load('Assets/sky.png').convert()
@@ -117,6 +127,8 @@ class Game:
         while True:
             self.screen.fill((34, 57, 94))
             self.draw_background_sky()
+            self.render_life()
+            self.render_score()
             self.check_events()
             self.check_player_movements()
 
