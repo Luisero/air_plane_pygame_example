@@ -74,8 +74,18 @@ class Enemy:
         if not self.context.player.position_dic['x'] - interval <= self.position_dic['x'] <= self.context.player.position_dic['x'] + interval:
             self.can_fire = True
     def shoot(self):
+        is_bomb = [True, False]
+        is_bomb = random.choice(is_bomb)
+        acceleration_y = .1
+        velocity_y = 5
+        sprite_path = 'Assets/bullet2.png'
+        if is_bomb:
+            acceleration_y = .1
+            velocity_y = 0
+            sprite_path = 'Assets/bomb1.png'
+
         self.bullets.append(Bullet(self.position_dic['x'] + self.enemy_size[1] / 2,\
-                                   self.position_dic['y'], .1, 5, self.velocity['x'],'Assets/bullet2.png'))
+                                   self.position_dic['y'], acceleration_y, velocity_y, self.velocity['x'],sprite_path, is_bomb=is_bomb))
 
     def update(self):
         self.velocity['x'] += self.acceleration['x']

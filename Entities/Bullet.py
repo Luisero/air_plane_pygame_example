@@ -5,16 +5,23 @@ import pygame as pg
 class Bullet:
     damage = 100
 
-    def __init__(self, player_position_x, player_position_y, acceleration_y, velocity_y, velocity_x, sprite_path, sound_path=None) -> None:
+    def __init__(self, player_position_x, player_position_y, acceleration_y, velocity_y, velocity_x, sprite_path, sound_path=None, is_bomb=False) -> None:
 
         self.size = (20, 20)
         self.position_x = player_position_x
         self.position_y = player_position_y
         self.velocity_y = velocity_y
-        self.velocity_x = velocity_x*.1
         self.acceleration_y = acceleration_y
         self.sprite_path = sprite_path
-        self.sound_path = 'Assets/Sound/shoot.wav'
+        self.is_bomb = is_bomb
+        if self.is_bomb:
+            self.velocity_x = velocity_x *.2
+        else:
+            self.velocity_x = velocity_x *.1
+        if self.is_bomb:
+            self.sound_path = 'Assets/Sound/bomb1.mp3'
+        else:
+            self.sound_path = 'Assets/Sound/shoot.wav'
         if type(sound_path) == None:
             self.sound_path = sound_path
         self.fire_sound(self.sound_path)
@@ -27,6 +34,8 @@ class Bullet:
     def draw(self, game):
         image= pg.image.load(self.sprite_path).convert_alpha()
         image = pg.transform.scale(image, self.size)
+        if self.is_bomb:
+            image = pg.transform.flip(image, False, True)
         self.mask_collider = pg.mask.from_surface(image)
         self.image = game.screen.blit(image, (self.position_x, self.position_y))
         #pg.draw.rect(game.screen,'red', (self.position_x, self.position_y, self.size[0], self.size[1]) )
