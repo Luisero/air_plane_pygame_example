@@ -16,12 +16,11 @@ class Bullet:
         self.is_bomb = is_bomb
         if self.is_bomb:
             self.velocity_x = velocity_x *.2
-        else:
-            self.velocity_x = velocity_x *.1
-        if self.is_bomb:
             self.sound_path = 'Assets/Sound/bomb1.mp3'
         else:
+            self.velocity_x = velocity_x *.1
             self.sound_path = 'Assets/Sound/shoot.wav'
+
         if type(sound_path) == None:
             self.sound_path = sound_path
         self.fire_sound(self.sound_path)

@@ -62,10 +62,14 @@ class Enemy:
 
     def check_fire(self):
         interval = random.randint(60,100)
-        decide_fire = [True, False]
+        decide_fire = [True, False, False]
 
-
-        if self.can_fire and len(self.bullets) <random.randint(1,2):
+        max_fires= 2
+        min_fires = 1
+        if 'enemy3' in self.sprite_list[0]:
+            max_fires = 5
+            min_fires = 3
+        if self.can_fire and len(self.bullets) <random.randint(min_fires,max_fires):
             if self.context.player.position_dic['x'] - interval <= self.position_dic['x'] <= self.context.player.position_dic['x'] + interval:
                 if random.choice(decide_fire):
                     self.shoot()
@@ -74,7 +78,16 @@ class Enemy:
         if not self.context.player.position_dic['x'] - interval <= self.position_dic['x'] <= self.context.player.position_dic['x'] + interval:
             self.can_fire = True
     def shoot(self):
-        is_bomb = [True, False]
+        is_bomb = [True, False, False, False]
+        if 'enemy2' in self.sprite_list[0]:
+            is_bomb.append(True)
+            is_bomb.append(True)
+            is_bomb.append(True)
+            is_bomb.append(True)
+        elif 'enemy3' in self.sprite_list[0]:
+            del is_bomb[0]
+
+
         is_bomb = random.choice(is_bomb)
         acceleration_y = .1
         velocity_y = 5
@@ -96,7 +109,7 @@ class Enemy:
         self.remove_bullet()
     def is_in_corners(self):
         if self.can_turn:
-            if (self.position_dic['x'] < self.enemy_size[0]/2) or (self.position_dic['x'] > self.context.WINDOW_WIDTH - self.enemy_size[0] * 3):
+            if (self.position_dic['x'] < self.enemy_size[0]/(random.uniform(1, 2))) or (self.position_dic['x'] > self.context.WINDOW_WIDTH - self.enemy_size[0] * 3):
                 self.can_turn = not self.can_turn
                 from time import sleep
                 #print(f'Can turn: {self.can_turn} Left: {self.is_going_left} Right: {self.is_going_right}')

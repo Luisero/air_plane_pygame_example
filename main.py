@@ -39,10 +39,10 @@ class Game:
         self.time_last_reload = 0
 
         self.enemies = [
-            Enemy(context=self,life=100, position_dic={'x': self.WINDOW_WIDTH, 'y':30}, enemy_size = (60,50), \
-                  sprite_list=['Assets/basic_enemy.png'],bullet_sprite='Assets/bullet.png',\
-                  acceleration_increaser=0.1, max_velocity={'x':.2,'y':0})
+
         ]
+        self.add_enemy()
+        self.add_enemy()
 
         self.sky_images =[]
 
@@ -119,8 +119,8 @@ class Game:
         random_positions = [self.WINDOW_WIDTH, -30]
         position = random.choice(random_positions)
         self.enemies.append(
-            Enemy(context=self, life=100, position_dic={'x': position+randint(-50,50), 'y': randint(30,60)}, enemy_size=(60, 50), \
-                  sprite_list=['Assets/basic_enemy.png'], bullet_sprite='Assets/bullet.png', \
+            Enemy(context=self, life=100, position_dic={'x': position+randint(50,60), 'y': randint(30,60)}, enemy_size=(60, 50), \
+                  sprite_list=[f'Assets/Basic_enemies/basic_enemy{randint(0,3)}.png'], bullet_sprite='Assets/bullet.png', \
                   acceleration_increaser=0.1, max_velocity={'x': .2, 'y': 0})
         )
     def run(self):
@@ -142,7 +142,7 @@ class Game:
             print(f'\tAcceleration: {self.enemies[0].acceleration["x"]}')
             print(f'\tVelocity: {self.enemies[0].acceleration["x"]}')'''
 
-            if (self.time % 1000) == 0:
+            if (self.time % 2000) == 0:
                 self.add_enemy()
 
             #print(self.enemies[0].position_dic['x'])

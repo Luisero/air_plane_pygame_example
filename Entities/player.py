@@ -101,7 +101,9 @@ class Player:
 
                 overlap = self.mask_collider.overlap(bullet.get_mask_collider(), offset)
                 if overlap:
-                    Bullet.damage = 20
+                    Bullet.damage = 10
+                    if bullet.is_bomb:
+                        Bullet.damage = 20
                     self.life -= Bullet.damage
                     bullet.remove(self.context, enemie_bullet=True)
                     sound = pg.mixer.Sound('Assets/Sound/damage.mp3')
