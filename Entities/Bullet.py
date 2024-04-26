@@ -1,9 +1,10 @@
 import pygame as pg
-import random 
+import random
+import pygame as pg
 
 class Bullet:
     damage = 100
-    def __init__(self, player_position_x, player_position_y, acceleration_y, velocity_y, velocity_x, sprite_path) -> None:
+    def __init__(self, player_position_x, player_position_y, acceleration_y, velocity_y, velocity_x, sprite_path, sound_path=None) -> None:
 
         self.size = (20, 20)
         self.position_x = player_position_x
@@ -12,6 +13,14 @@ class Bullet:
         self.velocity_x = velocity_x*.1
         self.acceleration_y = acceleration_y
         self.sprite_path = sprite_path
+        self.sound_path = 'Assets/Sound/shoot.wav'
+        if type(sound_path) == None:
+            self.sound_path = sound_path
+        self.fire_sound(self.sound_path)
+
+    def fire_sound(self, sound_path):
+        sound = pg.mixer.Sound(sound_path)
+        sound.play()
 
 
     def draw(self, game):
@@ -24,8 +33,14 @@ class Bullet:
     def get_mask_collider(self):
         return self.mask_collider
     
-    def remove(self, game):
-        game.player.bullets.remove(self)
+    def remove(self, game, enemie_bullet):
+        if not enemie_bullet:
+            game.player.bullets.remove(self)
+        else:
+            for enemie in game.enemies:
+                for bullet in enemie.bullets:
+                    if bullet == self:
+                        enemie.bullets.remove(self)
 
     def update_position(self):
 

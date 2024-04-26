@@ -34,7 +34,10 @@ class Game:
                   sprite_list=['Assets/basic_enemy.png'],bullet_sprite='Assets/bullet.png',\
                   acceleration_increaser=0.1, max_velocity={'x':.2,'y':0})
         ]
+
+        pg.mixer.init()
         self.sky_images =[]
+
         self.load_sky_image()
 
     def load_sky_image(self):
@@ -45,7 +48,9 @@ class Game:
             self.sky_images.append({"image":image,'y':-i*height})
 
 
-
+    def game_over(self):
+        pg.quit()
+        sys.exit()
 
     def draw_background_sky(self):
         for i,image in enumerate(self.sky_images):
@@ -116,6 +121,7 @@ class Game:
                 self.add_enemy()
 
             #print(self.enemies[0].position_dic['x'])
+            print(self.player.life)
             self.time = pg.time.get_ticks()
             #sleep(.1)
 

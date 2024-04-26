@@ -62,10 +62,13 @@ class Enemy:
 
     def check_fire(self):
         interval = random.randint(60,100)
+        decide_fire = [True, False]
 
-        if self.can_fire and len(self.bullets) <1:
+
+        if self.can_fire and len(self.bullets) <random.randint(1,2):
             if self.context.player.position_dic['x'] - interval <= self.position_dic['x'] <= self.context.player.position_dic['x'] + interval:
-                self.shoot()
+                if random.choice(decide_fire):
+                    self.shoot()
 
 
         if not self.context.player.position_dic['x'] - interval <= self.position_dic['x'] <= self.context.player.position_dic['x'] + interval:
@@ -130,8 +133,10 @@ class Enemy:
             if overlap:
 
                 self.life -= Bullet.damage
+                sound = pg.mixer.Sound('Assets/Sound/damage.mp3')
+                sound.play()
                 if self.life <=0:
-                    bullet.remove(self.context)
+                    bullet.remove(self.context, enemie_bullet=False)
                     self.remove()
 
     def remove_bullet(self):

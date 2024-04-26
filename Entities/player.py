@@ -7,7 +7,7 @@ class Player:
         self.player_size = player_size
         self.context = context
         self.position_dic = position_dic
-
+        self.life = 100
         self.bullets = []
 
         self.max_velocity ={ 
@@ -74,6 +74,7 @@ class Player:
         self.draw()
         self.remove_bullet()
         self.draw_bullets()
+        self.detect_collison()
 
     def shoot(self):
         self.bullets.append(Bullet(self.position_dic['x']+ self.player_size[1]/2, \
@@ -90,8 +91,28 @@ class Player:
             bullet.draw(self.context)
             bullet.update_position()
 
+    def detect_collison(self):
+        for enemie in self.context.enemies:
+            for bullet in enemie.bullets:
+                offset = (bullet.position_x - self.position_dic['x'], bullet.position_y - self.position_dic['y'])
+
+                overlap = self.mask_collider.overlap(bullet.get_mask_collider(), offset)
+                if overlap:
+                    Bullet.damage = 20
+                    self.life -= Bullet.damage
+                    bullet.remove(self.context, enemie_bullet=True)
+                    sound = pg.mixer.Sound('Assets/Sound/damage.mp3')
+                    sound.play()
+
+                    if self.life <=0:
+                        self.context.game_over()
+
+
+
+
     def draw(self):
         #self.box_collider.draw(self.game,self.position)
         image = pg.image.load('Assets/ship_player.png')
         image = pg.transform.scale(image, self.player_size)
+        self.mask_collider = pg.mask.from_surface(image)
         self.image = self.context.screen.blit(image, (self.position_dic['x'], self.position_dic['y']))
