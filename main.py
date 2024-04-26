@@ -29,6 +29,11 @@ class Game:
         self.time = pg.time.get_ticks()
         self.clock = pg.time.Clock()
 
+        milisecond = 1
+        second = 1000 * milisecond
+        self.time_to_reload = second
+        self.time_last_reload = 0
+
         self.enemies = [
             Enemy(context=self,life=100, position_dic={'x': self.WINDOW_WIDTH, 'y':30}, enemy_size = (60,50), \
                   sprite_list=['Assets/basic_enemy.png'],bullet_sprite='Assets/bullet.png',\
@@ -80,6 +85,13 @@ class Game:
                 if event.key == pg.K_SPACE:
                     self.player.shoot()
 
+    def reload_player_ammo(self):
+        if self.time_last_reload > self.time_to_reload:
+            if self.player.player_ammo < Player.max_ammo:
+                self.player.player_ammo = Player.max_ammo
+
+            self.time_last_reload = 0
+
     def draw_enemies(self):
         for enemy in self.enemies:
             enemy.draw()
@@ -109,6 +121,7 @@ class Game:
             self.check_player_movements()
 
             self.player.update()
+            self.reload_player_ammo()
             self.draw_enemies()
             self.update_enemies()
             terminal.clear_terminal()
@@ -126,7 +139,8 @@ class Game:
             #sleep(.1)
 
             pg.display.flip()
-            self.clock.tick(60)
+            self.delta_time = self.clock.tick(60)
+            self.time_last_reload += self.delta_time
 
 
 

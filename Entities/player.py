@@ -3,12 +3,14 @@ from .Bullet import Bullet
 from math import fabs, floor
 
 class Player:
+    max_ammo = 3
     def __init__(self, context, position_dic, player_size) -> None:
         self.player_size = player_size
         self.context = context
         self.position_dic = position_dic
         self.life = 100
         self.bullets = []
+        self.player_ammo = 3
 
         self.max_velocity ={ 
             'x': 1.5,
@@ -77,9 +79,10 @@ class Player:
         self.detect_collison()
 
     def shoot(self):
-        self.bullets.append(Bullet(self.position_dic['x']+ self.player_size[1]/2, \
-                                   self.position_dic['y'], -.1,-5,self.velocity['x'], 'Assets/bullet.png'))
-
+        if self.player_ammo >0:
+            self.bullets.append(Bullet(self.position_dic['x']+ self.player_size[1]/2, \
+                                       self.position_dic['y'], -.1,-5,self.velocity['x'], 'Assets/bullet.png'))
+            self.player_ammo -= 1
 
 
     def remove_bullet(self):

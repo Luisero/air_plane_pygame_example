@@ -4,6 +4,7 @@ import pygame as pg
 
 class Bullet:
     damage = 100
+
     def __init__(self, player_position_x, player_position_y, acceleration_y, velocity_y, velocity_x, sprite_path, sound_path=None) -> None:
 
         self.size = (20, 20)
