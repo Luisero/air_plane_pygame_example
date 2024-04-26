@@ -13,6 +13,7 @@ class Game:
         pg.init()
         pg.mixer.init()
         pg.font.init()
+        self.delta_time = 0
 
         self.font = pg.font.SysFont(None, 36)
         self.score = 0
@@ -142,7 +143,7 @@ class Game:
             print(f'\tAcceleration: {self.enemies[0].acceleration["x"]}')
             print(f'\tVelocity: {self.enemies[0].acceleration["x"]}')'''
 
-            if (self.time % 2000) == 0:
+            if (self.time % 1000) == 0:
                 self.add_enemy()
 
             #print(self.enemies[0].position_dic['x'])

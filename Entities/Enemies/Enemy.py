@@ -1,5 +1,5 @@
 import random
-
+import math
 import pygame as pg
 from math import fabs, floor
 from time import sleep
@@ -14,10 +14,13 @@ class Enemy:
         self.sprite_list = sprite_list
         self.bullet_sprite = bullet_sprite
         self.acceleration_increaser = acceleration_increaser
+        self.temporary_acceleration_increaser = self.acceleration_increaser * 10
         self.max_velocity = max_velocity
         self.can_turn = True
         self.can_fire = True
+        self.has_exploded = False
         self.bullets = []
+
 
         self.velocity = {
             'x': 1,
@@ -38,7 +41,7 @@ class Enemy:
         image= pg.transform.flip(image, False, True)
         image = pg.transform.scale(image, self.enemy_size)
         self.mask_collider = pg.mask.from_surface(image)
-
+        
         self.image = self.context.screen.blit(image, (self.position_dic['x'], self.position_dic['y']))
 
 
@@ -80,10 +83,8 @@ class Enemy:
     def shoot(self):
         is_bomb = [True, False, False, False]
         if 'enemy2' in self.sprite_list[0]:
-            is_bomb.append(True)
-            is_bomb.append(True)
-            is_bomb.append(True)
-            is_bomb.append(True)
+           del is_bomb[1:]
+
         elif 'enemy3' in self.sprite_list[0]:
             del is_bomb[0]
 
@@ -93,20 +94,34 @@ class Enemy:
         velocity_y = 5
         sprite_path = 'Assets/bullet2.png'
         if is_bomb:
-            acceleration_y = .1
-            velocity_y = 0
+            acceleration_y = .2
+            velocity_y = -1
             sprite_path = 'Assets/bomb1.png'
 
         self.bullets.append(Bullet(self.position_dic['x'] + self.enemy_size[1] / 2,\
                                    self.position_dic['y'], acceleration_y, velocity_y, self.velocity['x'],sprite_path, is_bomb=is_bomb))
 
     def update(self):
+        
+            
         self.velocity['x'] += self.acceleration['x']
         self.position_dic['x'] += self.velocity['x']
         self.check_movement()
         self.check_fire()
         self.draw_bullets()
         self.remove_bullet()
+        
+        
+    def is_in_danger(self):
+        for bullet in self.context.player.bullets:
+            distance = math.sqrt((self.position_dic['x']- bullet.position_x)**2 + (self.position_dic['y'] - bullet.position_y)**2)
+            print(distance)
+            if bullet.position_x - self.enemy_size[0] < self.position_dic['x'] < bullet.position_x + self.enemy_size[0]/2 and distance < 70:
+                return True
+
+        return False    
+            
+        
     def is_in_corners(self):
         if self.can_turn:
             if (self.position_dic['x'] < self.enemy_size[0]/(random.uniform(1, 2))) or (self.position_dic['x'] > self.context.WINDOW_WIDTH - self.enemy_size[0] * 3):
@@ -125,14 +140,19 @@ class Enemy:
             return 'Right'
     def move_left(self):
         if self.velocity['x'] > - self.max_velocity['x']:
-
-            self.acceleration['x'] = -self.acceleration_increaser
+            if self.is_in_danger():
+                self.acceleration['x'] = -self.temporary_acceleration_increaser
+            else:
+                self.acceleration['x'] = -self.acceleration_increaser
             self.velocity['x'] += self.acceleration['x']
 
 
     def move_right(self):
         if self.velocity['x'] < self.max_velocity['x']:
-            self.acceleration['x'] = self.acceleration_increaser
+            if self.is_in_danger():
+                self.acceleration['x'] = self.temporary_acceleration_increaser
+            else:
+                self.acceleration['x'] = self.acceleration_increaser
             self.velocity['x'] += self.acceleration['x']
 
     def stop_enemy(self):
@@ -161,7 +181,14 @@ class Enemy:
                 sound.play()
                 if self.life <=0:
                     bullet.remove(self.context, enemie_bullet=False)
+                    if not self.has_exploded:
+                        
+                        print(self.has_exploded)
+                        #sleep(1)
+                        self.has_exploded = True
                     self.remove()
+
+    
 
     def remove_bullet(self):
         for bullet in self.bullets:

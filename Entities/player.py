@@ -28,14 +28,20 @@ class Player:
         }
 
     def check_movement(self, keys):
+        if self.is_in_corners():
+            if self.get_corner() == 'Left':
+                self.move_right()
+            else:
+                self.move_left()
 
-
-        if keys[pg.K_a]:
-            self.move_left()
-        elif keys[pg.K_d]:
-            self.move_right()
         else:
-            self.stop_player()
+            
+            if keys[pg.K_a]:
+                self.move_left()
+            elif keys[pg.K_d]:
+                self.move_right()
+            else:
+                self.stop_player()
 
 
     def move_left(self):
@@ -112,6 +118,18 @@ class Player:
                     if self.life <=0:
                         self.context.game_over()
 
+    def is_in_corners(self):
+
+        if (self.position_dic['x'] < self.player_size[0] / 1) or (self.position_dic['x'] > self.context.WINDOW_WIDTH - self.player_size[0]+20):
+            return True
+
+        return False
+
+    def get_corner(self):
+        if (self.position_dic['x'] < self.player_size[0]):
+            return 'Left'
+        else:
+            return 'Right'
 
 
 
