@@ -8,7 +8,7 @@ class Player:
         self.player_size = player_size
         self.context = context
         self.position_dic = position_dic
-        self.life = 100
+        self.life = 1000
         self.bullets = []
         self.player_ammo = 3
 
@@ -82,7 +82,7 @@ class Player:
         self.draw()
         self.remove_bullet()
         self.draw_bullets()
-        self.detect_collison()
+        
 
     def shoot(self):
         if self.player_ammo >0:
@@ -101,22 +101,24 @@ class Player:
             bullet.update_position()
 
     def detect_collison(self):
-        for enemie in self.context.enemies:
-            for bullet in enemie.bullets:
-                offset = (bullet.position_x - self.position_dic['x'], bullet.position_y - self.position_dic['y'])
+        
+        
+        
+        for bullet in self.context.bullets:
+            offset = (bullet.position_x - self.position_dic['x'], bullet.position_y - self.position_dic['y'])
 
-                overlap = self.mask_collider.overlap(bullet.get_mask_collider(), offset)
-                if overlap:
-                    Bullet.damage = 10
-                    if bullet.is_bomb:
-                        Bullet.damage = 20
-                    self.life -= Bullet.damage
-                    bullet.remove(self.context, enemie_bullet=True)
-                    sound = pg.mixer.Sound('Assets/Sound/damage.mp3')
-                    sound.play()
+            overlap = self.mask_collider.overlap(bullet.get_mask_collider(), offset)
+            if overlap:
+                Bullet.damage = 10
+                if bullet.is_bomb:
+                    Bullet.damage = 20
+                self.life -= Bullet.damage
+                bullet.remove(self.context, enemie_bullet=True)
+                sound = pg.mixer.Sound('Assets/Sound/damage.mp3')
+                sound.play()
 
-                    if self.life <=0:
-                        self.context.game_over()
+                if self.life <=0:
+                    self.context.game_over()
 
     def is_in_corners(self):
 

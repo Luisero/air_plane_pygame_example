@@ -14,6 +14,7 @@ class Bullet:
         self.acceleration_y = acceleration_y
         self.sprite_path = sprite_path
         self.is_bomb = is_bomb
+        
         if self.is_bomb:
             self.velocity_x = velocity_x *.2
             self.sound_path = 'Assets/Sound/bomb1.mp3'
@@ -49,7 +50,7 @@ class Bullet:
             for enemie in game.enemies:
                 for bullet in enemie.bullets:
                     if bullet == self:
-                        enemie.bullets.remove(self)
+                            enemie.bullets.remove(self)
 
     def update_position(self):
 

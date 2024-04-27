@@ -14,12 +14,18 @@ class Enemy:
         self.sprite_list = sprite_list
         self.bullet_sprite = bullet_sprite
         self.acceleration_increaser = acceleration_increaser
-        self.temporary_acceleration_increaser = self.acceleration_increaser * 10
+        
         self.max_velocity = max_velocity
         self.can_turn = True
-        self.can_fire = True
+        self.can_fire = False
         self.has_exploded = False
         self.bullets = []
+
+        self.max_fires= 2
+        self.min_fires = 1
+        if 'enemy3' in self.sprite_list[0]:
+            max_fires = 5
+            min_fires = 3
 
 
         self.velocity = {
@@ -56,30 +62,32 @@ class Enemy:
                 self.is_going_right = False
 
             #print(f'Can turn: {self.can_turn} Left: {self.is_going_left} Right: {self.is_going_right}')
-
-
+        
         if self.is_going_left:
             self.move_left()
         elif self.is_going_right:
             self.move_right()
 
-    def check_fire(self):
+    def check_can_fire(self):
         interval = random.randint(60,100)
-        decide_fire = [True, False, False]
+        if self.context.player.position_dic['x'] - interval <= self.position_dic['x'] <= self.context.player.position_dic['x'] + interval:
+            if len(self.bullets)== self.max_fires:
+                self.can_fire = False
+            else:
+                self.can_fire = True
+        else:
+            if len(self.bullets) == self.max_fires:
+                self.bullets = []
+            self.can_fire = False
+    
+    def check_fire(self):
+        decide_fire = [True, False, False, False]
 
-        max_fires= 2
-        min_fires = 1
-        if 'enemy3' in self.sprite_list[0]:
-            max_fires = 5
-            min_fires = 3
-        if self.can_fire and len(self.bullets) <random.randint(min_fires,max_fires):
-            if self.context.player.position_dic['x'] - interval <= self.position_dic['x'] <= self.context.player.position_dic['x'] + interval:
-                if random.choice(decide_fire):
-                    self.shoot()
+        
+        if self.can_fire:
+            if random.choice(decide_fire):
+                self.shoot()
 
-
-        if not self.context.player.position_dic['x'] - interval <= self.position_dic['x'] <= self.context.player.position_dic['x'] + interval:
-            self.can_fire = True
     def shoot(self):
         is_bomb = [True, False, False, False]
         if 'enemy2' in self.sprite_list[0]:
@@ -97,26 +105,29 @@ class Enemy:
             acceleration_y = .2
             velocity_y = -1
             sprite_path = 'Assets/bomb1.png'
-
-        self.bullets.append(Bullet(self.position_dic['x'] + self.enemy_size[1] / 2,\
+        self.bullets.append(1)
+        self.context.bullets.append(Bullet(self.position_dic['x'] + self.enemy_size[1] / 2,\
                                    self.position_dic['y'], acceleration_y, velocity_y, self.velocity['x'],sprite_path, is_bomb=is_bomb))
 
     def update(self):
         
-            
+       
         self.velocity['x'] += self.acceleration['x']
         self.position_dic['x'] += self.velocity['x']
         self.check_movement()
+        
+        #self.remove_bullet()
+        self.check_can_fire()
         self.check_fire()
-        self.draw_bullets()
-        self.remove_bullet()
         
         
     def is_in_danger(self):
         for bullet in self.context.player.bullets:
             distance = math.sqrt((self.position_dic['x']- bullet.position_x)**2 + (self.position_dic['y'] - bullet.position_y)**2)
             print(distance)
-            if bullet.position_x - self.enemy_size[0] < self.position_dic['x'] < bullet.position_x + self.enemy_size[0]/2 and distance < 70:
+            if bullet.position_x - self.enemy_size[0] <= self.position_dic['x'] <= bullet.position_x + self.enemy_size[0] and distance < 70:
+                print('Danger')
+                
                 return True
 
         return False    
@@ -140,19 +151,14 @@ class Enemy:
             return 'Right'
     def move_left(self):
         if self.velocity['x'] > - self.max_velocity['x']:
-            if self.is_in_danger():
-                self.acceleration['x'] = -self.temporary_acceleration_increaser
-            else:
-                self.acceleration['x'] = -self.acceleration_increaser
+            self.acceleration['x'] = -self.acceleration_increaser
             self.velocity['x'] += self.acceleration['x']
-
+            
 
     def move_right(self):
         if self.velocity['x'] < self.max_velocity['x']:
-            if self.is_in_danger():
-                self.acceleration['x'] = self.temporary_acceleration_increaser
-            else:
-                self.acceleration['x'] = self.acceleration_increaser
+            
+            self.acceleration['x'] = self.acceleration_increaser
             self.velocity['x'] += self.acceleration['x']
 
     def stop_enemy(self):
@@ -175,20 +181,20 @@ class Enemy:
             offset = (bullet.position_x - self.position_dic['x'], bullet.position_y - self.position_dic['y'])
             overlap = self.mask_collider.overlap(bullet.get_mask_collider(), offset)
             if overlap:
-
+                Bullet.damage = 120
                 self.life -= Bullet.damage
                 sound = pg.mixer.Sound('Assets/Sound/damage.mp3')
                 sound.play()
                 if self.life <=0:
+                    
                     bullet.remove(self.context, enemie_bullet=False)
                     if not self.has_exploded:
                         
-                        print(self.has_exploded)
-                        #sleep(1)
+                        
+                        
                         self.has_exploded = True
-                    self.remove()
+                        self.remove()
 
-    
 
     def remove_bullet(self):
         for bullet in self.bullets:

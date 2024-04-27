@@ -42,6 +42,11 @@ class Game:
         self.enemies = [
 
         ]
+
+        self.bullets = [
+
+        ]
+
         self.add_enemy()
         self.add_enemy()
 
@@ -108,6 +113,19 @@ class Game:
             enemy.draw()
             enemy.detect_collison()
 
+    def draw_bullets(self):
+        for bullet in self.bullets:
+            bullet.draw(self)
+            bullet.update_position()
+    
+    def remove_bullets(self):
+        for bullet in self.bullets:
+            if bullet.position_x <0 or bullet.position_x > self.WINDOW_WIDTH or bullet.position_y > self.WINDOW_HEIGHT*1.1:
+                
+                self.bullets.remove(bullet)
+    
+
+
     def update_enemies(self):
         for enemy in self.enemies:
             enemy.update()
@@ -136,6 +154,9 @@ class Game:
             self.player.update()
             self.reload_player_ammo()
             self.draw_enemies()
+            self.remove_bullets()
+            self.draw_bullets()
+            self.player.detect_collison() 
             self.update_enemies()
             terminal.clear_terminal()
             '''print(f'Acceleration: {self.player.acceleration["x"]}')
@@ -143,11 +164,12 @@ class Game:
             print(f'\tAcceleration: {self.enemies[0].acceleration["x"]}')
             print(f'\tVelocity: {self.enemies[0].acceleration["x"]}')'''
 
-            if (self.time % 1000) == 0:
+            if (self.time % 500) == 0:
                 self.add_enemy()
 
             #print(self.enemies[0].position_dic['x'])
             print(self.player.life)
+            print(self.bullets)
             self.time = pg.time.get_ticks()
             #sleep(.1)
 
