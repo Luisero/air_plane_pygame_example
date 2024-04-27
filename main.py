@@ -6,6 +6,7 @@ from Entities.player import Player
 from time import sleep
 from Debug import  terminal
 from Entities.Enemies.Enemy import Enemy
+from Entities.Enemies.Boss import Boss 
 from random import randint
 from Entities.Itens.LifeRestoreItem import LifeRestoreItem
 
@@ -17,6 +18,7 @@ class Game:
         self.delta_time = 0
 
         self.is_boss_fight = False
+        self.boss_list = []
 
         self.font = pg.font.SysFont(None, 36)
         self.score = 0
@@ -155,7 +157,25 @@ class Game:
     def remove_overpassed_itens(self):
         for item in self.itens:
             if item.position['y'] > self.WINDOW_HEIGHT:
-                self.itens.remove(self)
+                self.itens.remove(item)
+
+    def add_boss(self):
+        position = {'x':self.CENTER[0], 'y':40}
+        self.boss_list.append(
+            Boss(context=self, life= 5000, position_dic=position, enemy_size=(70,60),\
+                 sprite_list=['Assets/Bosses/boss1.png'], bullet_sprite='Assets/bullet3.png',\
+                    acceleration_increaser=0.05, max_velocity={'x':.3, 'y':0})
+        )
+        self.boss_list[0].is_boss = True
+
+    def update_boss(self):
+        if len(self.boss_list)>0: 
+            self.boss_list[0].update()
+    
+    def draw_boss(self):
+        if len(self.boss_list)>0: 
+                self.boss_list[0].draw()
+                self.boss_list[0].detect_collison()
 
     def add_enemy(self):
         random_positions = [self.WINDOW_WIDTH, -30]
@@ -189,8 +209,16 @@ class Game:
             print(f'\tAcceleration: {self.enemies[0].acceleration["x"]}')
             print(f'\tVelocity: {self.enemies[0].acceleration["x"]}')'''
 
-            if (self.time % 100) == 0 and not self.is_boss_fight:
+            if (self.time % 500) == 0 and not self.is_boss_fight:
                 self.add_enemy()
+
+            if self.score == 2:
+                self.is_boss_fight = True
+                self.add_boss()
+
+            if self.is_boss_fight:
+                self.update_boss()
+                self.draw_boss()
 
             if self.player.life <= 50:
                 life_itens = 0

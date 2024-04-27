@@ -4,6 +4,7 @@ import pygame as pg
 from math import fabs, floor
 from time import sleep
 from Entities.Bullet import Bullet
+from Entities.RemoteGuided import RemoteGuided
 
 class Enemy:
     def __init__(self, context, life, position_dic,enemy_size, sprite_list, bullet_sprite, acceleration_increaser, max_velocity):
@@ -20,15 +21,18 @@ class Enemy:
         self.can_fire = False
         self.has_exploded = False
         self.bullets = []
-
+        self.is_boss = False
         
 
         self.max_fires= 2
         self.min_fires = 1
-        if 'enemy3' in self.sprite_list[0]:
-            max_fires = 6
-            min_fires = 4
 
+        
+        if 'enemy3' in self.sprite_list[0]:
+            self.max_fires = 6
+            self.min_fires = 4
+        
+       
 
         self.velocity = {
             'x': 1,
@@ -71,6 +75,9 @@ class Enemy:
             self.move_right()
 
     def check_can_fire(self):
+        if self.is_boss:
+            self.max_fires= 6
+            self.min_fires = 4
         interval = random.randint(60,100)
         if self.context.player.position_dic['x'] - interval <= self.position_dic['x'] <= self.context.player.position_dic['x'] + interval:
             if len(self.bullets)== self.max_fires:
@@ -91,6 +98,7 @@ class Enemy:
                 self.shoot()
 
     def shoot(self):
+            
         is_bomb = [True, False, False, False]
         if 'enemy2' in self.sprite_list[0]:
            del is_bomb[1:]
@@ -100,16 +108,48 @@ class Enemy:
 
 
         is_bomb = random.choice(is_bomb)
+        is_remote_guided = False
+        if self.is_boss:
+            is_remote_guided = [True]
+        
+            is_remote_guided = random.choice(is_remote_guided)
+
         acceleration_y = .1
         velocity_y = 5
-        sprite_path = 'Assets/bullet2.png'
+        sprite_path = self.bullet_sprite
         if is_bomb:
             acceleration_y = .2
             velocity_y = -1
             sprite_path = 'Assets/bomb1.png'
+        elif is_remote_guided:
+            acceleration_y = .3
+            velocity_y = 1
+            sprite_path = 'Assets/remote_guided.png'
+            
+        
+            
+
         self.bullets.append(1)
-        self.context.bullets.append(Bullet(self.position_dic['x'] + self.enemy_size[1] / 2,\
-                                   self.position_dic['y'], acceleration_y, velocity_y, self.velocity['x'],sprite_path, is_bomb=is_bomb))
+        if is_remote_guided:
+            self.context.bullets.append(
+                RemoteGuided(self.position_dic['x'],+ self.enemy_size[1] / 2,\
+                                   self.position_dic['y'], acceleration_y, velocity_y, \
+                                    self.velocity['x'],sprite_path, is_bomb, self.context)
+            )
+            self.context.bullets.append(
+                RemoteGuided(self.position_dic['x'],+ self.enemy_size[1],\
+                                   self.position_dic['y'], acceleration_y, velocity_y, \
+                                    self.velocity['x'],sprite_path, is_bomb=is_bomb, context=self.context)
+            )
+
+        else:
+            self.context.bullets.append(Bullet(self.position_dic['x'] + self.enemy_size[1] / 2,\
+                                    self.position_dic['y'], acceleration_y, velocity_y, self.velocity['x'],sprite_path, is_bomb=is_bomb))
+            if self.is_boss:
+                self.context.bullets.append(Bullet(self.position_dic['x'] + self.enemy_size[1] ,\
+                                    self.position_dic['y'], acceleration_y, velocity_y, self.velocity['x'],sprite_path, is_bomb=is_bomb))
+        #    last_index = len(self.context.bullets)-1
+         #   self.context.bullets[last_index].size = (30,30)
 
     def update(self):
         
@@ -183,7 +223,7 @@ class Enemy:
             offset = (bullet.position_x - self.position_dic['x'], bullet.position_y - self.position_dic['y'])
             overlap = self.mask_collider.overlap(bullet.get_mask_collider(), offset)
             if overlap:
-                Bullet.damage = 120
+                Bullet.damage = 100
                 self.life -= Bullet.damage
                 sound = pg.mixer.Sound('Assets/Sound/damage.mp3')
                 sound.play()
@@ -192,10 +232,12 @@ class Enemy:
                     bullet.remove(self.context, enemie_bullet=False)
                     if not self.has_exploded:
                         
-                        
-                        
                         self.has_exploded = True
-                        self.remove()
+                        if not self.is_boss:
+                            self.remove()
+                        else:
+                            self.context.score += 1
+                            self.context.boss_list  = []
 
 
     def remove_bullet(self):
