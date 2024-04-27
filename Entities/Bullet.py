@@ -14,6 +14,7 @@ class Bullet:
         self.acceleration_y = acceleration_y
         self.sprite_path = sprite_path
         self.is_bomb = is_bomb
+        self.is_missile = False
         
         if self.is_bomb:
             self.velocity_x = velocity_x *.2

@@ -76,8 +76,8 @@ class Enemy:
 
     def check_can_fire(self):
         if self.is_boss:
-            self.max_fires= 6
-            self.min_fires = 4
+            self.max_fires= 4
+            self.min_fires = 2
         interval = random.randint(60,100)
         if self.context.player.position_dic['x'] - interval <= self.position_dic['x'] <= self.context.player.position_dic['x'] + interval:
             if len(self.bullets)== self.max_fires:
@@ -96,6 +96,7 @@ class Enemy:
         if self.can_fire:
             if random.choice(decide_fire):
                 self.shoot()
+    
 
     def shoot(self):
             
@@ -109,8 +110,10 @@ class Enemy:
 
         is_bomb = random.choice(is_bomb)
         is_remote_guided = False
-        if self.is_boss:
+        if self.is_boss and not is_bomb:
             is_remote_guided = [True]
+            for i in range(5):
+                is_remote_guided.append(False)
         
             is_remote_guided = random.choice(is_remote_guided)
 
@@ -122,25 +125,27 @@ class Enemy:
             velocity_y = -1
             sprite_path = 'Assets/bomb1.png'
         elif is_remote_guided:
-            acceleration_y = .3
+            acceleration_y = .1
             velocity_y = 1
             sprite_path = 'Assets/remote_guided.png'
             
+            
         
             
-
         self.bullets.append(1)
         if is_remote_guided:
+            
             self.context.bullets.append(
-                RemoteGuided(self.position_dic['x'],+ self.enemy_size[1] / 2,\
-                                   self.position_dic['y'], acceleration_y, velocity_y, \
-                                    self.velocity['x'],sprite_path, is_bomb, self.context)
+                RemoteGuided(player_position_x=self.position_dic['x']+ self.enemy_size[1] / 2,\
+                                   player_position_y=self.position_dic['y'], acceleration_y= acceleration_y, velocity_y = velocity_y, \
+                                    velocity_x= self.velocity['x'], sprite_path=sprite_path, is_bomb=is_bomb, context=self.context)
             )
-            self.context.bullets.append(
-                RemoteGuided(self.position_dic['x'],+ self.enemy_size[1],\
-                                   self.position_dic['y'], acceleration_y, velocity_y, \
-                                    self.velocity['x'],sprite_path, is_bomb=is_bomb, context=self.context)
-            )
+            #self.context.bullets.append(
+            #    RemoteGuided(player_position_x=self.position_dic['x']+ self.enemy_size[1],\
+            #                       player_position_y=self.position_dic['y'], acceleration_y= acceleration_y, velocity_y = velocity_y, \
+            #                        velocity_x= self.velocity['x'], sprite_path=sprite_path, is_bomb=is_bomb, context=self.context)
+            #)
+            
 
         else:
             self.context.bullets.append(Bullet(self.position_dic['x'] + self.enemy_size[1] / 2,\
@@ -236,6 +241,7 @@ class Enemy:
                         if not self.is_boss:
                             self.remove()
                         else:
+                            
                             self.context.score += 1
                             self.context.boss_list  = []
 

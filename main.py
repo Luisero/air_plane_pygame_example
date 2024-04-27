@@ -1,5 +1,4 @@
 import random
-
 import pygame as pg
 import sys
 from Entities.player import Player
@@ -80,8 +79,9 @@ class Game:
 
 
     def game_over(self):
-        pg.quit()
-        sys.exit()
+        sound = pg.mixer.Sound('Assets/Sound/lose.wav')
+        sound.play()
+        
 
     def draw_background_sky(self):
         for i,image in enumerate(self.sky_images):
@@ -162,13 +162,20 @@ class Game:
     def add_boss(self):
         position = {'x':self.CENTER[0], 'y':40}
         self.boss_list.append(
-            Boss(context=self, life= 5000, position_dic=position, enemy_size=(70,60),\
+            Boss(context=self, life= 500, position_dic=position, enemy_size=(70,60),\
                  sprite_list=['Assets/Bosses/boss1.png'], bullet_sprite='Assets/bullet3.png',\
                     acceleration_increaser=0.05, max_velocity={'x':.3, 'y':0})
         )
         self.boss_list[0].is_boss = True
 
     def update_boss(self):
+        if self.is_boss_fight and len(self.boss_list) == 0:
+            if pg.mixer.Channel(0).get_busy() == True:
+                pass
+            else:
+    
+                sound = pg.mixer.Sound('Assets/Sound/win.wav')
+                sound.play()
         if len(self.boss_list)>0: 
             self.boss_list[0].update()
     
@@ -212,7 +219,7 @@ class Game:
             if (self.time % 500) == 0 and not self.is_boss_fight:
                 self.add_enemy()
 
-            if self.score == 2:
+            if self.score == 10:
                 self.is_boss_fight = True
                 self.add_boss()
 

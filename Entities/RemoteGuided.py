@@ -6,10 +6,12 @@ class RemoteGuided(Bullet):
         super().__init__(player_position_x, player_position_y, acceleration_y, velocity_y, velocity_x, sprite_path, sound_path, is_bomb)
         self.context = context
         self.acceleration_x = .1
+        self.size = (20,30)
+        self.is_missile = True
     
     def update_position(self):
         if self.position_x < self.context.player.position_dic['x'] :
-            self.velocity_x  += self.acceleration_
+            self.velocity_x  += self.acceleration_x
         else:
             self.velocity_x -= self.acceleration_x   
 

@@ -30,7 +30,7 @@ class Item:
         if overlap:
             self.is_picked = True 
             self.add_effect()
-            
+            self.play_sound()
             return self.is_picked
 
     def check_is_active(self):
@@ -61,4 +61,7 @@ class Item:
     def add_effect(self):
         self.effect()
     
+    def play_sound(self):
+        sound = pg.mixer.Sound('Assets/Sound/item_pick.mp3')
+        sound.play()
         

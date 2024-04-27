@@ -11,4 +11,6 @@ class LifeRestoreItem(Item):
         def effect():
             self.context.player.life = Player.default_life
         return effect
+    
+    
 
