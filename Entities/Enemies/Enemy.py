@@ -21,11 +21,13 @@ class Enemy:
         self.has_exploded = False
         self.bullets = []
 
+        
+
         self.max_fires= 2
         self.min_fires = 1
         if 'enemy3' in self.sprite_list[0]:
-            max_fires = 5
-            min_fires = 3
+            max_fires = 6
+            min_fires = 4
 
 
         self.velocity = {
@@ -81,7 +83,7 @@ class Enemy:
             self.can_fire = False
     
     def check_fire(self):
-        decide_fire = [True, False, False, False]
+        decide_fire = [True, False, False]
 
         
         if self.can_fire:

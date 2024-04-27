@@ -47,10 +47,10 @@ class Bullet:
         if not enemie_bullet:
             game.player.bullets.remove(self)
         else:
-            for enemie in game.enemies:
-                for bullet in enemie.bullets:
-                    if bullet == self:
-                            enemie.bullets.remove(self)
+            for bullet in game.bullets:
+                
+                if bullet == self:
+                    game.bullets.remove(self)
 
     def update_position(self):
 

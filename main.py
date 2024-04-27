@@ -7,6 +7,7 @@ from time import sleep
 from Debug import  terminal
 from Entities.Enemies.Enemy import Enemy
 from random import randint
+from Entities.Itens.LifeRestoreItem import LifeRestoreItem
 
 class Game:
     def __init__(self, win_size=(400,600)):
@@ -14,6 +15,8 @@ class Game:
         pg.mixer.init()
         pg.font.init()
         self.delta_time = 0
+
+        self.is_boss_fight = False
 
         self.font = pg.font.SysFont(None, 36)
         self.score = 0
@@ -35,8 +38,8 @@ class Game:
         self.clock = pg.time.Clock()
 
         milisecond = 1
-        second = 1000 * milisecond
-        self.time_to_reload = second
+        self.second = 1000 * milisecond
+        self.time_to_reload = self.second
         self.time_last_reload = 0
 
         self.enemies = [
@@ -45,6 +48,10 @@ class Game:
 
         self.bullets = [
 
+        ]
+
+        self.itens = [
+        
         ]
 
         self.add_enemy()
@@ -63,7 +70,8 @@ class Game:
         self.screen.blit(score_text, (10, 35))
     def load_sky_image(self):
         for i in range(0, 3):
-            image = pg.image.load('Assets/sky.png').convert()
+            images = ['sky.png', 'stars.png']
+            image = pg.image.load(f'Assets/{random.choice(images)}').convert()
             image = pg.transform.scale(image, (self.WINDOW_HEIGHT, self.WINDOW_HEIGHT)  )
             height = image.get_height()
             self.sky_images.append({"image":image,'y':-i*height})
@@ -118,6 +126,10 @@ class Game:
             bullet.draw(self)
             bullet.update_position()
     
+    def update_itens(self):
+        for item in self.itens:
+            item.update()
+    
     def remove_bullets(self):
         for bullet in self.bullets:
             if bullet.position_x <0 or bullet.position_x > self.WINDOW_WIDTH or bullet.position_y > self.WINDOW_HEIGHT*1.1:
@@ -133,6 +145,17 @@ class Game:
     def check_player_movements(self):
 
         self.player.check_movement(keys=pg.key.get_pressed())
+
+    def add_item(self, type):
+        if type == 'Life':
+            self.itens.append(LifeRestoreItem(self,velocity={'x':0,'y':1}, acceleration={'x':0,'y':.1},\
+                            position={'x':randint(0, self.WINDOW_WIDTH-50),'y':-5},\
+                                effect_time=2, item_asset='Assets/Itens/heart.png',size=(50,50)))
+    
+    def remove_overpassed_itens(self):
+        for item in self.itens:
+            if item.position['y'] > self.WINDOW_HEIGHT:
+                self.itens.remove(self)
 
     def add_enemy(self):
         random_positions = [self.WINDOW_WIDTH, -30]
@@ -152,6 +175,8 @@ class Game:
             self.check_player_movements()
 
             self.player.update()
+            self.update_itens()
+            self.remove_overpassed_itens()
             self.reload_player_ammo()
             self.draw_enemies()
             self.remove_bullets()
@@ -164,8 +189,17 @@ class Game:
             print(f'\tAcceleration: {self.enemies[0].acceleration["x"]}')
             print(f'\tVelocity: {self.enemies[0].acceleration["x"]}')'''
 
-            if (self.time % 500) == 0:
+            if (self.time % 100) == 0 and not self.is_boss_fight:
                 self.add_enemy()
+
+            if self.player.life <= 50:
+                life_itens = 0
+                for item in self.itens:
+                    if item.type =='Life':
+                        life_itens +=1
+                
+                if life_itens == 0:
+                    self.add_item('Life')
 
             #print(self.enemies[0].position_dic['x'])
             print(self.player.life)

@@ -1,14 +1,16 @@
 import pygame as pg
 from .Bullet import Bullet
-from math import fabs, floor
+from math import fabs, floor, sin 
+
 
 class Player:
     max_ammo = 3
+    default_life = 100
     def __init__(self, context, position_dic, player_size) -> None:
         self.player_size = player_size
         self.context = context
         self.position_dic = position_dic
-        self.life = 1000
+        self.life = self.default_life
         self.bullets = []
         self.player_ammo = 3
 
@@ -79,6 +81,7 @@ class Player:
     def update(self):
         self.velocity['x'] += self.acceleration['x']
         self.position_dic['x'] += self.velocity['x']
+        self.position_dic['y'] += sin(self.context.time)
         self.draw()
         self.remove_bullet()
         self.draw_bullets()
@@ -100,6 +103,9 @@ class Player:
             bullet.draw(self.context)
             bullet.update_position()
 
+    def get_mask_collider(self):
+        return self.mask_collider
+
     def detect_collison(self):
         
         
@@ -109,7 +115,7 @@ class Player:
 
             overlap = self.mask_collider.overlap(bullet.get_mask_collider(), offset)
             if overlap:
-                Bullet.damage = 10
+                Bullet.damage = 5
                 if bullet.is_bomb:
                     Bullet.damage = 20
                 self.life -= Bullet.damage
