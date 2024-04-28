@@ -1,7 +1,8 @@
 import pygame as pg
 from .Bullet import Bullet
 from math import fabs, floor, sin 
-
+from .BombExplosion import BombExplosion
+from .Explosion import Explosion
 
 class Player:
     max_ammo = 3
@@ -117,9 +118,13 @@ class Player:
             if overlap:
                 Bullet.damage = 5
                 if bullet.is_bomb:
+                    self.context.explosions.add(BombExplosion(self.position_dic, 0.1))
                     Bullet.damage = 15
                 elif bullet.is_missile:
                     Bullet.damage = 25
+                    self.context.explosions.add(Explosion(self.position_dic, 0.1))
+                else:
+                    self.context.explosions.add(Explosion(self.position_dic, 0.1))
                 self.life -= Bullet.damage
                 bullet.remove(self.context, enemie_bullet=True)
                 sound = pg.mixer.Sound('Assets/Sound/damage.mp3')

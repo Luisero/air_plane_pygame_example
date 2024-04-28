@@ -4,6 +4,7 @@ import pygame as pg
 from math import fabs, floor
 from time import sleep
 from Entities.Bullet import Bullet
+from Entities.Explosion import Explosion
 from Entities.RemoteGuided import RemoteGuided
 
 class Enemy:
@@ -232,18 +233,24 @@ class Enemy:
                 self.life -= Bullet.damage
                 sound = pg.mixer.Sound('Assets/Sound/damage.mp3')
                 sound.play()
+                
                 if self.life <=0:
-                    
                     bullet.remove(self.context, enemie_bullet=False)
                     if not self.has_exploded:
                         
                         self.has_exploded = True
                         if not self.is_boss:
+                            self.context.explosions.add(Explosion(self.position_dic, 0.2))
                             self.remove()
                         else:
-                            
+                            explosion = Explosion(self.position_dic, 0.2)
+                            explosion.size = (60,60)
+                            self.context.explosions.add(explosion)
                             self.context.score += 1
                             self.context.boss_list  = []
+
+                    elif self.is_boss:
+                        self.context.explosions.add(Explosion(self.position_dic, 0.1))
 
 
     def remove_bullet(self):

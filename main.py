@@ -55,12 +55,18 @@ class Game:
         
         ]
 
+        self.explosions = pg.sprite.Group()
+
         self.add_enemy()
         self.add_enemy()
 
         self.sky_images =[]
 
         self.load_sky_image()
+
+    def draw_explosions(self):
+        self.explosions.draw(self.screen)
+        self.explosions.update()
 
     def render_life(self):
         life_text = self.font.render(f'Life: {self.player.life}', True, 'white')
@@ -162,7 +168,7 @@ class Game:
     def add_boss(self):
         position = {'x':self.CENTER[0], 'y':40}
         self.boss_list.append(
-            Boss(context=self, life= 500, position_dic=position, enemy_size=(70,60),\
+            Boss(context=self, life= 6000, position_dic=position, enemy_size=(70,60),\
                  sprite_list=['Assets/Bosses/boss1.png'], bullet_sprite='Assets/bullet3.png',\
                     acceleration_increaser=0.05, max_velocity={'x':.3, 'y':0})
         )
@@ -210,12 +216,13 @@ class Game:
             self.draw_bullets()
             self.player.detect_collison() 
             self.update_enemies()
+            self.draw_explosions()
             terminal.clear_terminal()
             '''print(f'Acceleration: {self.player.acceleration["x"]}')
             print(f'Velocity: {self.player.velocity["x"]}')
             print(f'\tAcceleration: {self.enemies[0].acceleration["x"]}')
             print(f'\tVelocity: {self.enemies[0].acceleration["x"]}')'''
-
+            
             if (self.time % 500) == 0 and not self.is_boss_fight:
                 self.add_enemy()
 
