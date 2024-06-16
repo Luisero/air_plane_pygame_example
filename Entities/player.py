@@ -82,7 +82,7 @@ class Player:
     def update(self):
         self.velocity['x'] += self.acceleration['x']
         self.position_dic['x'] += self.velocity['x']
-        self.position_dic['y'] += sin(self.context.time)
+        #self.position_dic['y'] += sin(self.context.time)
         self.draw()
         self.remove_bullet()
         self.draw_bullets()

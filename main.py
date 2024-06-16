@@ -19,6 +19,7 @@ class Game:
         self.is_boss_fight = False
         self.boss_list = []
 
+        self.spawn_time = 0
         self.font = pg.font.SysFont(None, 36)
         self.score = 0
         self.WINDOW_SIZE = win_size
@@ -223,7 +224,8 @@ class Game:
             print(f'\tAcceleration: {self.enemies[0].acceleration["x"]}')
             print(f'\tVelocity: {self.enemies[0].acceleration["x"]}')'''
             
-            if (self.time % 500) == 0 and not self.is_boss_fight:
+            self.spawn_time +=1
+            if (self.spawn_time % 200) == 0 and not self.is_boss_fight:
                 self.add_enemy()
 
             if self.score == 10:
